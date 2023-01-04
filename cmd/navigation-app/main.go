@@ -16,8 +16,10 @@ func main() {
 	}
 	controller := v1.NewVisitorController(visitorService)
 	router := mux.NewRouter()
-	router.HandleFunc("/visit", controller.Visit)
-	router.HandleFunc("/info", controller.GetUniqueVisits)
+
+	router.HandleFunc("/visit", controller.Visit).Methods("POST")
+	router.HandleFunc("/info", controller.GetUniqueVisits).Methods("GET")
+
 	server := http.Server{
 		Addr:    ":8080",
 		Handler: router,

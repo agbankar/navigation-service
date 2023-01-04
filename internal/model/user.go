@@ -12,7 +12,6 @@ type User struct {
 
 type PageDetails struct {
 	UserIds map[string]EmptyStruct
-	Counter int
 }
 type ApiResponse struct {
 	Page           string `json:"page,omitempty"`

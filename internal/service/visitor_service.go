@@ -24,33 +24,28 @@ func (s *VisitorService) Visit(u *model.User) error {
 func (s *VisitorService) GetUniqueVisits(url string) int {
 	visits := s.read(url)
 	if visits != nil {
-		return visits.Counter
+		return len(visits.UserIds)
 	}
 	return 0
 }
 func (s *VisitorService) write(u *model.User) error {
-	pageData := s.read(u.Url)
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
-	if pageData != nil {
-		_, ok := pageData.UserIds[u.UserId]
-		if !ok {
-			ids := pageData.UserIds
-			ids[u.UserId] = VoidStruct
-			data := model.PageDetails{
-				Counter: pageData.Counter + 1,
-				UserIds: ids,
-			}
-			s.PageVisits[u.Url] = data
+	p := s.PageVisits[u.UserId]
+	_, ok := p.UserIds[u.UserId]
+	if ok {
+		ids := p.UserIds
+		ids[u.UserId] = VoidStruct
+		data := model.PageDetails{
+			UserIds: ids,
 		}
+		s.PageVisits[u.Url] = data
 		return nil
 	}
-
 	m := make(map[string]model.EmptyStruct)
 	m[u.UserId] = VoidStruct
 	s.PageVisits[u.Url] = model.PageDetails{
 		UserIds: m,
-		Counter: 1,
 	}
 	return nil
 
